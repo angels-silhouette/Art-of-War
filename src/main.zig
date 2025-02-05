@@ -1,22 +1,27 @@
 const std = @import("std");
 const print = std.debug.print;
-const raylib = @import("raylib");
+const rl = @import("raylib");
+const ui = @import("ui.zig");
 
-pub fn main() anyerror!void {
-    const screen_width = 800;
-    const screen_height = 400;
+var current_screen: [32]u8 = "start";
 
-    raylib.initWindow(screen_width, screen_height, "raylib basic window");
-    defer raylib.closeWindow();
+pub fn main() !void {
+    rl.initWindow(1000, 800, "The Art of War");
+    defer rl.closeWindow();
 
-    raylib.setTargetFPS(60);
+    rl.initAudioDevice();
+    defer rl.closeAudioDevice();
 
-    while (!raylib.windowShouldClose()) {
-        raylib.beginDrawing();
-        defer raylib.endDrawing();
+    rl.setTargetFPS(60);
 
-        raylib.clearBackground(raylib.Color.white);
+    rl.toggleFullscreen();
 
-        raylib.drawText("UwU", 190, 200, 20, raylib.Color.black);
+    while (!rl.windowShouldClose()) {
+        rl.beginDrawing();
+        defer rl.endDrawing();
+
+        if (std.mem.eql(u8, current_screen, "start")) {
+            ui.draw_ui(ui.start_ui);
+        }
     }
 }
