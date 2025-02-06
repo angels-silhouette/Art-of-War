@@ -15,10 +15,7 @@ pub fn main() !void {
     rl.initAudioDevice();
     defer rl.closeAudioDevice();
 
-    {
-        const sounds = try ui.LoadSounds();
-        ui.sounds = sounds;
-    }
+    try ui.initUI();
 
     rl.setTargetFPS(60);
 
@@ -28,7 +25,7 @@ pub fn main() !void {
         rl.beginDrawing();
         defer rl.endDrawing();
         switch (game_state) {
-            .start => ui.drawUI(&ui.start_ui),
+            .start => ui.drawUI(ui.start_ui),
         }
     }
 }

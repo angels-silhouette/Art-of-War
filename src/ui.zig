@@ -2,26 +2,8 @@ const std = @import("std");
 const allocator = std.heap.page_allocator;
 const rl = @import("raylib");
 
-pub var sounds: []rl.Sound = undefined;
-
-pub fn LoadSounds() ![]rl.Sound {
-    var list = std.ArrayList(rl.Sound).init(allocator);
-    defer list.deinit();
-
-    const snap = try rl.loadSound("assets/snap.ogg");
-    try list.append(snap);
-
-    const slice = list.items;
-    return slice;
-}
-
-pub fn drawUI(ui_elements: []UIElement) void {
-    // const height = rl.getRenderHeight();
-    // const width = rl.getRenderWidth();
-    for (ui_elements) |element| {
-        std.debug.print("{}", .{element});
-    }
-}
+var sounds: []rl.Sound = undefined;
+pub var start_ui: []UIElement = undefined;
 
 const Relative = enum {
     top_left,
@@ -49,21 +31,39 @@ const Button = struct {
     size: @Vector(2, i32),
     text: []const u8,
     sound_effect: rl.Sound,
-    pub fn init(coordinates: Position, size: @Vector(2, i32), text: []const u8, sound_effect: rl.Sound) Button {
-        return Button{
-            .coordinates = coordinates,
-            .size = size,
-            .text = text,
-            .sound_effect = sound_effect,
-        };
-    }
 };
 
-pub var start_ui = [_]UIElement{
-    // Button.init(
-    //     Position{ .vector = @Vector(2, i32){ 10, 10 } },
-    //     @Vector(2, i32){ 100, 100 },
-    //     "Start",
-    //     sounds[0],
-    // ),
-};
+fn loadSounds() !void {
+    var list = std.ArrayList(rl.Sound).init(allocator);
+
+    const snap = try rl.loadSound("assets/snap.ogg");
+    try list.append(snap);
+
+    sounds = list.items;
+}
+
+pub fn initUI() !void {
+    try loadSounds();
+
+    {
+        var list = std.ArrayList(UIElement).init(allocator);
+
+        const button = UIElement{ .button = Button{
+            .coordinates = Position{ .vector = @Vector(2, i32){ 10, 10 } },
+            .size = @Vector(2, i32){ 100, 100 },
+            .text = "Start",
+            .sound_effect = sounds[0],
+        } };
+        try list.append(button);
+
+        start_ui = list.items;
+    }
+}
+
+pub fn drawUI(ui_elements: []UIElement) void {
+    // const height = rl.getRenderHeight();
+    // const width = rl.getRenderWidth();
+    for (ui_elements) |element| {
+        std.debug.print("{}", .{element});
+    }
+}
