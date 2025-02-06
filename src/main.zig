@@ -1,9 +1,12 @@
 const std = @import("std");
-const print = std.debug.print;
 const rl = @import("raylib");
 const ui = @import("ui.zig");
 
-var current_screen: [32]u8 = "start";
+const State = enum {
+    start,
+};
+
+var game_state = State.start;
 
 pub fn main() !void {
     rl.initWindow(1000, 800, "The Art of War");
@@ -12,6 +15,11 @@ pub fn main() !void {
     rl.initAudioDevice();
     defer rl.closeAudioDevice();
 
+    {
+        const sounds = try ui.LoadSounds();
+        ui.sounds = sounds;
+    }
+
     rl.setTargetFPS(60);
 
     rl.toggleFullscreen();
@@ -19,9 +27,8 @@ pub fn main() !void {
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
         defer rl.endDrawing();
-
-        if (std.mem.eql(u8, current_screen, "start")) {
-            ui.draw_ui(ui.start_ui);
+        switch (game_state) {
+            .start => ui.drawUI(&ui.start_ui),
         }
     }
 }
